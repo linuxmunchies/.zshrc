@@ -1,4 +1,3 @@
-
 # Key bindings
 bindkey -e
 typeset -g -A key
@@ -44,25 +43,11 @@ export EDITOR=nvim
 # Prompt Modification
 PROMPT='%F{blue}%~%f %# '
 
-# Obsidian Sync Function
-obsidian_sync() {
-    local direction=$1
-    local source
-    local destination
+# This loads the Zsh completion system module.
+# -U flag prevents alias expansion during function loading.
+# -z flag forces zsh-style autoloading.
+autoload -Uz compinit
+compinit
 
-    if [[ "$direction" == "pull" ]]; then
-        source="ProtonDrive:Archives/Obsidian/"
-        destination="$HOME/ProtonDrive/Archives/Obsidian/"
-    elif [[ "$direction" == "push" ]]; then
-        source="$HOME/ProtonDrive/Archives/Obsidian/"
-        destination="ProtonDrive:Archives/Obsidian/"
-    else
-        echo "Usage: obsidian_sync [pull|push]"
-        return 1
-    fi
-
-    echo "Syncing Obsidian archives ($direction)..."
-    rclone sync "$source" "$destination" --progress
-    echo "Sync complete."
-}
-
+# Menu-Like Interface
+zstyle ':completion:*' menu select
