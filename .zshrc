@@ -34,10 +34,10 @@ setopt share_history
 setopt hist_ignore_dups
 
 # Aliases & Arch Linux package management
-alias pacupdate="sudo pacman -Syu"
-alias pacinstall="sudo pacman -S"
-alias pacremove="sudo pacman -Rs"
-alias pacsearch="pacman -Ss"
+# alias pacupdate="sudo pacman -Syu"
+# alias pacinstall="sudo pacman -S"
+# alias pacremove="sudo pacman -Rs"
+# alias pacsearch="pacman -Ss"
 alias zshrc="nvim ~/.zshrc"
 
 
