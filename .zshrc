@@ -1,3 +1,5 @@
+# Remove '/' from word characters
+export WORDCHARS='*?_.~=&;!#$%^(){}<>'
 
 # Key bindings
 bindkey -e
@@ -200,4 +202,3 @@ obsidian_sync() {
 
     return 0
 }
-
