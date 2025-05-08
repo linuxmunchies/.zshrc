@@ -63,6 +63,17 @@ compinit
 # Menu-Like Interface
 zstyle ':completion:*' menu select
 
+# Place this in your ~/.zshrc
+fzf_pacman() {
+  # List installed packages, pass to fzf with a preview pane
+  pacman -Qq \
+    | fzf \
+        --preview="pacman -Qi {1}" \
+        --preview-window="right:60%" \
+        --height=40% --layout=reverse --border
+}
+
+
 obsidian_sync() {
     local direction=$1
     local source
