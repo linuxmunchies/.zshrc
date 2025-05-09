@@ -63,7 +63,6 @@ compinit
 # Menu-Like Interface
 zstyle ':completion:*' menu select
 
-# Place this in your ~/.zshrc
 fzf_pacman() {
   # List installed packages, pass to fzf with a preview pane
   pacman -Qq \
