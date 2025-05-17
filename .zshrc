@@ -75,13 +75,14 @@ fzf_pacman() {
 
 obsidian_sync() {
     local direction=$1
-    local source
-    local destination
+    local specific_backup=$2  # Optional parameter for pull to specify which backup to restore
     local exit_code
     local vault_folder="FoxVault"
-    local zip_file="FoxVault.zip"
+    local timestamp=$(date "+%Y%m%d_%H%M%S")  # Format: YYYYMMDD_HHMMSS[2]
+    local base_zip_name="FoxVault"
+    local zip_file
     local local_vault_path="$HOME/ProtonDrive/Archives/Obsidian/$vault_folder"
-    local local_zip_path="$HOME/ProtonDrive/Archives/Obsidian/$zip_file"
+    local local_zip_path
     local remote_base="ProtonDrive:Archives/Obsidian"
 
     # Check if required tools are installed
@@ -107,13 +108,27 @@ obsidian_sync() {
         echo "Pulling FoxVault from ProtonDrive..."
 
         # Create local directory if it doesn't exist
-        mkdir -p "$(dirname "$local_zip_path")"
+        mkdir -p "$HOME/ProtonDrive/Archives/Obsidian"
 
-        # Check if remote zip exists
-        if ! rclone lsf "$remote_base/$zip_file" &> /dev/null; then
-            echo "Error: Remote zip file '$remote_base/$zip_file' does not exist."
-            return 1
+        if [[ -n "$specific_backup" ]]; then
+            # Use specified backup file
+            zip_file=$specific_backup
+        else
+            # Find the latest backup file by listing all backups and sorting by name
+            # This works because the timestamp format (YYYYmmdd_HHMMSS) is sortable
+            echo "Finding most recent backup..."
+            latest_backup=$(rclone lsf "$remote_base" --include "${base_zip_name}_*.zip" | sort -r | head -n 1)
+            
+            if [[ -z "$latest_backup" ]]; then
+                echo "Error: No FoxVault backups found on ProtonDrive."
+                return 1
+            fi
+            
+            zip_file=$latest_backup
+            echo "Latest backup: $zip_file"
         fi
+        
+        local_zip_path="$HOME/ProtonDrive/Archives/Obsidian/$zip_file"
 
         # Download the zip file
         echo "Downloading $zip_file from ProtonDrive..."
@@ -130,7 +145,7 @@ obsidian_sync() {
 
         # Backup existing vault if it exists
         if [[ -d "$local_vault_path" ]]; then
-            local backup_dir="${local_vault_path}_backup_$(date +%Y%m%d_%H%M%S)"
+            local backup_dir="${local_vault_path}_backup_$(date +%Y%m%d_%H%M%S)"[4]
             echo "Backing up existing vault to $backup_dir"
             mv "$local_vault_path" "$backup_dir"
         fi
@@ -156,9 +171,13 @@ obsidian_sync() {
             return $exit_code
         fi
 
-    # Push: Zip local vault and upload to ProtonDrive
+    # Push: Zip local vault and upload to ProtonDrive with timestamp
     elif [[ "$direction" == "push" ]]; then
-        echo "Pushing FoxVault to ProtonDrive..."
+        # For push, always use timestamped filename
+        zip_file="${base_zip_name}_${timestamp}.zip"[3]
+        local_zip_path="$HOME/ProtonDrive/Archives/Obsidian/$zip_file"
+        
+        echo "Pushing FoxVault to ProtonDrive with timestamp: $timestamp"
 
         # Check if local vault exists
         if [[ ! -d "$local_vault_path" ]]; then
@@ -191,22 +210,24 @@ obsidian_sync() {
         # Ensure the remote directory exists
         rclone mkdir "$remote_base" 2>/dev/null
 
-        # Upload only the zip file
+        # Upload the timestamped zip file
         echo "Uploading $zip_file to ProtonDrive..."
         rclone copy "$local_zip_path" "$remote_base" --progress
         exit_code=$?
 
         if [[ $exit_code -eq 0 ]]; then
-            echo "✅ FoxVault successfully zipped and pushed to ProtonDrive."
+            echo "✅ FoxVault successfully zipped and pushed to ProtonDrive with timestamp: $timestamp"
         else
             echo "❌ Upload failed with error code $exit_code."
             return $exit_code
         fi
 
     else
-        echo "Usage: obsidian_sync [pull|push]"
+        echo "Usage: obsidian_sync [pull|push] [specific_backup_file]"
         echo "  pull: Download and extract FoxVault from ProtonDrive"
-        echo "  push: Zip and upload FoxVault to ProtonDrive"
+        echo "      If specific_backup_file is provided, pulls that file"
+        echo "      Otherwise pulls the most recent backup"
+        echo "  push: Zip and upload FoxVault to ProtonDrive with timestamp"
         return 1
     fi
 
