@@ -161,12 +161,19 @@ fzf_pkgs() {
 # Requires: rclone, zip, unzip
 obsidian_sync() {
     local direction="$1"
-    local readonly vault_name="FoxVault"
-    local readonly local_archive_base_dir="$HOME/ProtonDrive/Archives/Obsidian"
-    local readonly remote_rclone_name="ProtonDrive"
-    local readonly remote_archive_path_on_drive="Archives/Obsidian"
-    local readonly local_vault_path="${local_archive_base_dir}/${vault_name}"
-    local readonly remote_base_rclone_path="${remote_rclone_name}:${remote_archive_path_on_drive}"
+    local -r vault_name="FoxVault"
+    local -r local_archive_base_dir="$HOME/ProtonDrive/Archives/Obsidian"
+    local -r remote_rclone_name="ProtonDrive"
+    local -r remote_archive_path_on_drive="Archives/Obsidian"
+    local -r local_vault_path="${local_archive_base_dir}/${vault_name}"
+    local -r remote_base_rclone_path="${remote_rclone_name}:${remote_archive_path_on_drive}"
+
+    # Define colors properly for zsh
+    local -r RED=$'\033[0;31m'
+    local -r GREEN=$'\033[0;32m'
+    local -r YELLOW=$'\033[0;33m'
+    local -r BLUE=$'\033[0;34m'
+    local -r NC=$'\033[0m'  # No Color
 
     _obsidian_sync_check_prerequisites() {
         for tool in rclone zip unzip; do
@@ -191,8 +198,8 @@ obsidian_sync() {
             print -r -- "${RED}Error: No backups found in '${remote_base_rclone_path}'.${NC}" && return 1
         fi
         
-        local remote_zip_to_download="${remote_base_rclone_path}/${latest_backup_filename}"
-        local local_downloaded_zip_path="${local_archive_base_dir}/${latest_backup_filename}"
+        local -r remote_zip_to_download="${remote_base_rclone_path}/${latest_backup_filename}"
+        local -r local_downloaded_zip_path="${local_archive_base_dir}/${latest_backup_filename}"
 
         print -r -- "-> Latest backup: ${YELLOW}${latest_backup_filename}${NC}"
         if ! mkdir -p "$local_archive_base_dir"; then print -r -- "${RED}Error: Could not create '${local_archive_base_dir}'.${NC}" && return 1; fi
@@ -228,9 +235,9 @@ obsidian_sync() {
         print -r -- "${GREEN}✅ '${vault_name}' successfully pulled.${NC}"
 
     elif [[ "$direction" == "push" ]]; then
-        local timestamp=$(date "+%Y%m%d_%H%M%S")
-        local zip_filename="${vault_name}_${timestamp}.zip"
-        local local_zip_to_create_path="${local_archive_base_dir}/${zip_filename}"
+        local -r timestamp=$(date "+%Y%m%d_%H%M%S")
+        local -r zip_filename="${vault_name}_${timestamp}.zip"
+        local -r local_zip_to_create_path="${local_archive_base_dir}/${zip_filename}"
 
         print -r -- "${BLUE}Pushing '${local_vault_path}' to '${remote_rclone_name}'...${NC}"
 
@@ -259,3 +266,5 @@ obsidian_sync() {
     fi
     return 0
 }
+
+
