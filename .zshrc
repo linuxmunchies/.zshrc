@@ -47,11 +47,12 @@ export EDITOR=nvim
 # General Aliases
 alias ls='ls --color=auto'
 alias grep='grep --color=auto'
-alias zshrc="nvim ~/.zshrc"
-alias c='clear'
-alias ..='cd ..'
 alias ll='ls -lha'
 alias la='ls -A'
+alias copy='cp -iv'
+alias move='mv -iv'
+alias remove='rm -iv'
+alias list='lsd'
 
 # --- Distro-Aware Package Management Aliases ---
 # Detects the OS and sets aliases accordingly.
