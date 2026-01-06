@@ -87,8 +87,18 @@ take() {
 #------------------------------------------------------------------------------
 # PROMPT
 #------------------------------------------------------------------------------
-# Example: ~/Projects/my-project %
-PROMPT='%F{blue}%~%f %# '
+# 1. Enable variable substitution in the prompt
+setopt prompt_subst
+
+# 2. Load version control information
+autoload -Uz vcs_info
+precmd() { vcs_info }
+
+# 3. Format the git information: (branchname) in green
+zstyle ':vcs_info:git:*' formats ' %F{green}(%b)%f'
+
+#    %n = user, %~ = path, ${vcs_info...} = git branch
+PROMPT='%F{yellow}%n%f@%F{magenta}%~%f${vcs_info_msg_0_}$ '
 
 #------------------------------------------------------------------------------
 # COMPLETION SYSTEM
