@@ -39,6 +39,9 @@ bindkey '^[[D' backward-char         # LeftArrow
 # ALIASES, FUNCTIONS, AND ENVIRONMENT
 #------------------------------------------------------------------------------
 
+# Discord Bot Launcher
+alias fenchibot="cd ~/dev/discordbot && source .venv/bin/activate && python bot3.py"
+
 # Environment Variables
 export EDITOR=nvim
 # Use correct TERM variable for SSH sessions from Kitty
